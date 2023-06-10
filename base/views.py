@@ -1,21 +1,10 @@
 from django.shortcuts import render
-
-
-rooms=[
-    {"id":1, "name":"Learn Python"},
-    {"id":2, "name":"Learn PHP"},
-    {"id":3, "name":"Learn Django"},
-    {"id":4, "name":"Learn Laravel"},
-]
+from .models import Room
 
 def home(req):
-    data={"rooms":rooms}
+    data={"rooms": Room.objects.all()}
     return render(req, "base/home.html", data)
 
 def room(req, pk):
-    matchedRoom=None
-    for i in rooms:
-        if i["id"]==int(pk):
-            matchedRoom=i
-    data={"room":matchedRoom}
+    data={"room": Room.objects.get(id=pk)}
     return render(req, "base/room.html", data)

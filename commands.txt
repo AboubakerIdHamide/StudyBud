@@ -1,0 +1,9 @@
+commands:
+    - pyhton manage.py makemigrations => to make the created models migrations
+    - python manage.py migrate => exceute the migrations to database
+    - python manage.py createsuperuser => create admin
+
+models:
+    - to create a model check base/models.py
+    - to register a model (show it in the admin pannel check) base/admin.py
+    - one2many relationship models.py Message class
