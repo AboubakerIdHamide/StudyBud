@@ -1,9 +1,43 @@
 from django.shortcuts import render, redirect
-from .models import Room
+from django.db.models import Q
+from django.contrib import messages
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
+
+from .models import Room, Topic
 from .forms import RoomFrom
 
+def loginView(req):
+    if req.method=="POST":
+        username=req.POST.get('username')
+        password=req.POST.get('password')
+        try:
+            user= User.objects.get(username=username)
+        except:
+            messages.error(req, 'User does not exists')
+        
+        user=authenticate(req, username=username, password=password)
+        if user is not None:
+            login(req, user)
+            return redirect("home")
+        else:
+            messages.error(req, 'Invalid credentials !')
+    data={}
+    return render(req, 'base/login_register.html', data)
+
 def home(req):
-    data={"rooms": Room.objects.all()}
+    q=req.GET.get("q") if req.GET.get("q")!=None else ''
+    rooms= Room.objects.filter(
+            Q(topic__name__icontains=q) |
+            Q(name__icontains=q) |
+            Q(description__icontains=q)
+    )
+
+    data={
+        "rooms": rooms,
+        "topics": Topic.objects.all(),
+        "room_count": rooms.count()
+    }
     return render(req, "base/home.html", data)
 
 def room(req, pk):
