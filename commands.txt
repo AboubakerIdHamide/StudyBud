@@ -11,3 +11,6 @@ models:
 forms:
     - create forms => base/forms.py
     - how to use it => base/views.py in createRoom function
+
+static files :
+    - static cofiguration =>  StudyBud/setting.py line 122 STATICFILES_DIRS list

@@ -95,12 +95,27 @@ def room(req, pk):
     }
     return render(req, "base/room.html", data)
 
+def userProfile(req, pk):
+    user= User.objects.get(id=pk)
+    rooms= user.room_set.all()
+    room_messages=user.message_set.all()
+    topics=Topic.objects.all()
+    data={ 
+        "user": user,
+        "rooms": rooms,
+        "topics":topics,
+        "room_messages":room_messages
+    }
+    return render(req, "base/profile.html", data)
+
 @login_required(login_url='login')
 def createRoom(req):
     if req.method=="POST":
         form= RoomFrom(req.POST)
         if form.is_valid():
-            form.save()
+            room=form.save(commit=False)
+            room.host=req.user
+            room.save()
             return redirect("home")
 
     data={ 'form' : RoomFrom() }
