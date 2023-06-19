@@ -1,9 +1,36 @@
-<h3>Recent Activities</h3>
-<hr>
-{% for msg in room_messages %}
-    <div>
-        <small><a href="{% url 'user-profile'  msg.user.id %}"> @{{msg.user}} {{msg.created|timesince}}</a></small>
-        <small>replied to "{{msg.room}}"</small>
-        <p>{{msg}}</p>
+<div class="activities">
+    <div class="activities__header">
+      <h2>Recent Activities</h2>
     </div>
-{% endfor %}
+    {% for msg in room_messages %}
+        <div class="activities__box">
+            <div class="activities__boxHeader roomListRoom__header">
+                <a href="profile.html" class="roomListRoom__author">
+                <div class="avatar avatar--small">
+                    <img src="https://randomuser.me/api/portraits/men/{{ msg.user.id }}.jpg" />
+                </div>
+                <p>
+                    @{{msg.user}}
+                    <span>{{msg.created|timesince}}</span>
+                </p>
+                </a>
+                <div class="roomListRoom__actions">
+                <a href="#">
+                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                    <title>remove</title>
+                    <path
+                        d="M27.314 6.019l-1.333-1.333-9.98 9.981-9.981-9.981-1.333 1.333 9.981 9.981-9.981 9.98 1.333 1.333 9.981-9.98 9.98 9.98 1.333-1.333-9.98-9.98 9.98-9.981z"
+                    ></path>
+                    </svg>
+                </a>
+                </div>
+            </div>
+            <div class="activities__boxContent">
+                <p>replied to post “<a href="{% url 'room' msg.room.id %}">{{msg.room}}</a>”</p>
+                <div class="activities__boxRoomContent">
+                    {{msg}}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
