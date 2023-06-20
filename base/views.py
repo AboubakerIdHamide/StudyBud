@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 
 from .models import Room, Topic, Message
-from .forms import RoomFrom
+from .forms import RoomFrom, UserForm
 
 def loginUser(req):
     page='login'
@@ -55,6 +55,20 @@ def registerUser(req):
 def logoutUser(req):
     logout(req)
     return redirect("home")
+
+@login_required(login_url='login')
+def updateUser(req):
+    user=req.user
+    form=UserForm(instance=user)
+
+    if req.method=="POST":
+        form=UserForm( req.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect("user-profile", pk=user.id)
+
+    data={ 'form':form }
+    return render(req, "base/update-user.html", data)
 
 def home(req):
     q=req.GET.get("q") if req.GET.get("q")!=None else ''
@@ -111,14 +125,20 @@ def userProfile(req, pk):
 @login_required(login_url='login')
 def createRoom(req):
     if req.method=="POST":
-        form= RoomFrom(req.POST)
-        if form.is_valid():
-            room=form.save(commit=False)
-            room.host=req.user
-            room.save()
-            return redirect("home")
+        topic_name= req.POST.get("topic")
+        topic, created= Topic.objects.get_or_create(name=topic_name)
+        Room.objects.create(
+            host=req.user,
+            topic=topic,
+            name=req.POST.get("name"),
+            description=req.POST.get("description"),
+        )
+        return redirect("home")
 
-    data={ 'form' : RoomFrom() }
+    data={
+         'form' : RoomFrom(),
+         'topics' : Topic.objects.all(),
+    }
     return render(req, "base/room_form.html", data)
 
 @login_required(login_url='login')
@@ -130,12 +150,19 @@ def updateRoom(req, pk):
         return HttpResponse("You're not allowed here")
 
     if req.method=="POST":
-        form= RoomFrom(req.POST, instance=room)
-        if form.is_valid():
-            form.save()
-            return redirect("home")
+        topic_name= req.POST.get("topic")
+        topic, created= Topic.objects.get_or_create(name=topic_name)
+        room.topic= topic
+        room.name= req.POST.get("name")
+        room.description= req.POST.get("description")
+        room.save()
+        return redirect("home")
 
-    data={ 'form' : form }
+    data={ 
+        'form' : form,
+        'topics' : Topic.objects.all(),
+        'room':room
+    }
     return render(req, "base/room_form.html", data)
 
 @login_required(login_url='login')
