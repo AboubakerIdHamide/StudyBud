@@ -81,11 +81,21 @@ def home(req):
 
     data={
         "rooms": rooms,
-        "topics": Topic.objects.all(),
+        "topics": Topic.objects.all()[0:5],
         "room_count": rooms.count(),
         "room_messages":room_messages
     }
     return render(req, "base/home.html", data)
+
+def topicsPage(req):
+    q=req.GET.get("q") if req.GET.get("q")!=None else ''
+    data={ 'topics': Topic.objects.filter(name__icontains=q) }
+    return render(req, "base/topics.html", data)
+
+def activitiesPage(req):
+    room_messages=Message.objects.all()
+    data={ "room_messages":room_messages }
+    return render(req, "base/activity.html", data)
 
 def room(req, pk):
     room=Room.objects.get(id=pk)
