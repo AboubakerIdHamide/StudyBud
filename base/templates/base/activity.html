@@ -23,10 +23,10 @@
                 <div class="activities__boxHeader roomListRoom__header">
                     <a href="{% url 'user-profile' msg.user.id %}" class="roomListRoom__author">
                       <div class="avatar avatar--small">
-                          <img src="https://randomuser.me/api/portraits/men/{{ msg.user.id }}.jpg" />
+                          <img src="{{ msg.user.avatar.url }}" />
                       </div>
                       <p>
-                          @{{msg.user}}
+                          @{{msg.user.username}}
                           <span>{{msg.created|timesince}}</span>
                       </p>
                     </a>

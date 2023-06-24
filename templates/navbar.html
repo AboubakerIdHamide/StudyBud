@@ -22,7 +22,7 @@
             <div class="header__user">
                 <a href="{% url 'user-profile' request.user.id %}">
                     <div class="avatar avatar--medium active">
-                    <img src="https://randomuser.me/api/portraits/men/{{ request.user.id }}.jpg" />
+                    <img src="{{ user.avatar.url }}" />
                     </div>
                     {% if request.user.is_authenticated %}
                     <p>{{request.user.username}} <span>@{{request.user.username}}</span></p>

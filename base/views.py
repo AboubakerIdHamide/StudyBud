@@ -2,13 +2,11 @@ from django.shortcuts import render, redirect
 from django.db.models import Q
 from django.http import HttpResponse
 from django.contrib import messages
-from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
 
-from .models import Room, Topic, Message
-from .forms import RoomFrom, UserForm
+from .models import Room, Topic, Message, User
+from .forms import RoomFrom, UserForm, MyUserCreationForm
 
 def loginUser(req):
     page='login'
@@ -17,14 +15,14 @@ def loginUser(req):
         return redirect("home")
 
     if req.method=="POST":
-        username=req.POST.get('username').lower()
+        email=req.POST.get('email').lower()
         password=req.POST.get('password')
         try:
-            user= User.objects.get(username=username)
+            user= User.objects.get(email=email)
         except:
             messages.error(req, 'User does not exists')
         
-        user=authenticate(req, username=username, password=password)
+        user=authenticate(req, email=email, password=password)
         if user is not None:
             login(req, user)
             return redirect("home")
@@ -35,10 +33,10 @@ def loginUser(req):
     return render(req, 'base/login_register.html', data)
 
 def registerUser(req):
-    form=UserCreationForm()
+    form=MyUserCreationForm()
 
     if req.method=="POST":
-        form=UserCreationForm(req.POST)
+        form=MyUserCreationForm(req.POST)
         if form.is_valid():
             user=form.save(commit=False)
             user.username=user.username.lower()
@@ -62,7 +60,7 @@ def updateUser(req):
     form=UserForm(instance=user)
 
     if req.method=="POST":
-        form=UserForm( req.POST, instance=user)
+        form=UserForm( req.POST, req.FILES, instance=user)
         if form.is_valid():
             form.save()
             return redirect("user-profile", pk=user.id)
